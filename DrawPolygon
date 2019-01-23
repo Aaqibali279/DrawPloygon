@@ -1,0 +1,65 @@
+func drawPolygon(){
+        let path = polygonPath(center: view.center, radius: 100, sides: 5, offset: 0  )
+        let layer = CAShapeLayer()
+        layer.strokeColor = UIColor.red.cgColor
+        layer.borderWidth = 10
+        layer.path = path.cgPath
+        view.layer.addSublayer(layer)
+    }
+    
+    
+    func polygonPointArray(sides:Int,center:CGPoint,radius:CGFloat,offset:CGFloat)->[CGPoint] {
+        let angle:Double = (Double(360/sides))
+        let cx = center.x // x origin
+        let cy = center.y // y origin
+        let r = radius    // radius of circle
+        var i = 0
+        var points = [CGPoint]()
+        while i <= sides {
+            let ang = angle * Double(i)
+            let radian = CGFloat(ang.radians())
+            let alphaX = cos(radian)
+            let alphaY = sin(radian)
+            
+            /* unit of circle with origin(0,0) will have (x,y), where x = cos$ and y = sin$, whrer $ is angle in radians
+            */
+            let xpo = cx + r * alphaX
+            let ypo = cy + r * alphaY
+            
+            print(xpo,ypo)
+            
+            points.append(CGPoint(x: xpo, y: ypo))
+            i += 1
+        }
+        return points
+    }
+    /*
+     center is point where ploygons center lies
+     radius of the circle in which polygon lies or half of the diagonal
+     sides is the number of sides
+     offset is the value by which a polgon is rotated with respect to center
+     */
+    
+    func polygonPath(center:CGPoint, radius:CGFloat, sides:Int, offset:CGFloat) -> UIBezierPath {
+        let path = CGMutablePath()
+        let points = polygonPointArray(sides: sides,center: center,radius: radius, offset: offset)
+        let cpg = points[0]
+        path.move(to: CGPoint(x: cpg.x, y: cpg.y))
+        for p in points {
+            path.addLine(to: CGPoint(x: p.x, y: p.y))
+        }
+        path.closeSubpath()
+        let bezierPath = UIBezierPath(cgPath: path)
+        return bezierPath
+    }
+
+}
+
+extension Double {
+    func radians() -> CGFloat {
+        let b = Measurement(value: self, unit: UnitAngle.degrees).converted(to: UnitAngle.radians).value
+        return CGFloat(b)
+    }
+}
+
+
